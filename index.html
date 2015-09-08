@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-cn">
+	<head>
+		<title>Angular JS ngModel 过滤</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1.0">
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<link rel="stylesheet" href="styles/bootstrap.css">
+
+		<script src="js/libs/jquery.js"></script>
+		<script src="js/libs/angular.js"></script>		
+		<script src="js/libs/bootstrap.js"></script>				
+	</head>
+	<body ng-app="myApp">
+		<div class="panel panel-default" ng-controller="myCtrl">
+			<h1 class="panel-heading">ngModel 过滤</h1>
+			<div class="panel-body">
+				<input type="number" ng-model="product.price" fixed-number>
+				<span>{{product.price}}</span>
+				<button class="btn btn-default" ng-click="show()">打印模型</button>
+			</div>
+		</div>
+		<style>
+			
+		</style>
+		<script>
+			var myApp = angular.module('myApp', []);
+			myApp.controller('myCtrl', function ($scope) {
+				var product = $scope.product = {};
+				product.price = 30.055;
+				var temData = product.price;
+				$scope.show = function () {
+					console.log(product.price);
+				};
+			})
+			.directive('fixedNumber', function () {
+				return {
+					require: '?ngModel',
+					link: function (scope, element, attrs, ngModel) {
+						if (!ngModel) return;
+						ngModel.$viewChangeListeners.unshift(function() {
+							var value = scope.product.price;
+							console.log(value);
+							if (typeof value !== 'number') {
+								return;
+							};
+							value = value.toString();
+							var index = value.indexOf('.');
+							console.log(index);
+							if (index > 0) {
+								if (value.substr(index + 1).length > 3) {
+									value = value.substr(0, index + 4);
+									value = parseFloat(value);
+									console.log(value);
+									scope.product.price = value;
+								}
+							}
+						});
+					}
+				};
+			});
+		</script>	
+	</body>
+</html>
